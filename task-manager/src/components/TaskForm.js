@@ -1,54 +1,44 @@
-/*
--A Controlled form component that manages its own local state for task title and description inputs.
--integration with context Api to add new tasks globally.
--form validation and UX features
-*/ 
-
-import {useState} from 'react';
-import {useTaskContext} from '../context/TaskContext';
+import { useTaskContext } from '../context/TaskContext';
+import { useForm } from '../hooks/useForm';
+import { PRIORITY_LEVELS } from '../utils/constants';
+import { validateTask } from '../utils/helpers';
 import './TaskForm.css';
 
-function TaskForm()
-{
-  const {addTask} = useTaskContext();
-
-  const [formData,setFormData] = useState({
-    title:'',
-    description:'',
-    priority:'medium'
+function TaskForm() {
+  const { addTask } = useTaskContext();
+  
+  const { values, handleChange, resetForm } = useForm({
+    title: '',
+    description: '',
+    priority: PRIORITY_LEVELS.MEDIUM
   });
 
-  const handleSubmit = (e)=>{
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if(!formData.title.trim()) return;
-    addTask(formData);
+    
+    if (!validateTask(values)) {
+      return;
+    }
 
-    setFormData({
-      title:'',
-      description:'',
-      priority:'medium'
-    });
-  }
+    addTask(values);
+    resetForm();
+  };
 
-  const handleChange = (e)=>{
-    const {name,value} = e.target;
+  const isSubmitDisabled = !values.title.trim();
 
-    setFormData(prev=>({
-      ...prev,
-      [name]:value
-    }));
-  }
-
-  return(
+  return (
     <form className="task-form" onSubmit={handleSubmit}>
       <h2>Add New Task</h2>
+      
       <div className="form-group">
-        <label htmlFor='title'>Title *</label>
-        <input 
+        <label htmlFor="title">
+          Title <span className="required">*</span>
+        </label>
+        <input
           type="text"
           id="title"
           name="title"
-          value={formData.title}
+          value={values.title}
           onChange={handleChange}
           placeholder="Enter task title"
           required
@@ -56,35 +46,40 @@ function TaskForm()
       </div>
 
       <div className="form-group">
-        <label htmlFor='description'>Description</label>
+        <label htmlFor="description">Description</label>
         <textarea
           id="description"
           name="description"
-          value={formData.description}
+          value={values.description}
           onChange={handleChange}
-          placeholder="Enter task description"
+          placeholder="Enter task description (optional)"
           rows="3"
-        ></textarea>
+        />
       </div>
 
       <div className="form-group">
-        <label htmlFor='priority'>Priority</label>
+        <label htmlFor="priority">Priority</label>
         <select
           id="priority"
           name="priority"
-          value={formData.priority}
+          value={values.priority}
           onChange={handleChange}
         >
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
+          <option value={PRIORITY_LEVELS.LOW}>Low</option>
+          <option value={PRIORITY_LEVELS.MEDIUM}>Medium</option>
+          <option value={PRIORITY_LEVELS.HIGH}>High</option>
         </select>
       </div>
 
-      <button type="submit" disabled={!formData.title.trim()} className="add-task-btn">Add Task</button>
-
+      <button 
+        type="submit" 
+        disabled={isSubmitDisabled} 
+        className="add-task-btn"
+      >
+        Add Task
+      </button>
     </form>
-  )
-}  
+  );
+}
 
 export default TaskForm;

@@ -1,6 +1,7 @@
 {
-  "name": "task-manager",
-  "version": "0.1.0",
+  "name": "react-essentials-assignment",
+  "version": "1.0.0",
+  "description": "A Professional Task Manager Application using React Context API & useReducer",
   "private": true,
   "dependencies": {
     "@testing-library/dom": "^10.4.1",

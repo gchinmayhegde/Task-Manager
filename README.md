@@ -1,2 +1,2 @@
-# Task-Manager
-A Professional React App to maintain your daily tasks
+# Task Manager Application
+> A professional React task management app built with Context API and useReducer for efficient state management.
