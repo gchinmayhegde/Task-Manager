@@ -1,40 +1,47 @@
+import { useState } from 'react';
 import { useTaskContext } from '../context/TaskContext';
-import { useToggle } from '../hooks/useToggle';
-import { useForm } from '../hooks/useForm';
 import { getPriorityColor, formatDate } from '../utils/helpers';
 import { PRIORITY_LEVELS } from '../utils/constants';
 import './TaskItem.css';
 
 function TaskItem({ task }) {
   const { toggleTask, deleteTask, editTask } = useTaskContext();
-  const [isEditing, , startEditing, stopEditing] = useToggle(false);
+  const [isEditing, setIsEditing] = useState(false);
   
-  const { values, handleChange, setFormValues } = useForm({
+  const [editData, setEditData] = useState({
     title: task.title,
     description: task.description,
     priority: task.priority
   });
 
   const handleEdit = () => {
-    if (values.title.trim()) {
-      editTask(task.id, values);
-      stopEditing();
+    if (editData.title.trim()) {
+      editTask(task.id, editData);
+      setIsEditing(false);
     }
   };
 
   const handleCancel = () => {
-    setFormValues({
+    setEditData({
       title: task.title,
       description: task.description,
       priority: task.priority
     });
-    stopEditing();
+    setIsEditing(false);
   };
 
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this task?')) {
       deleteTask(task.id);
     }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   // Editing mode UI
@@ -45,7 +52,7 @@ function TaskItem({ task }) {
           <input
             type="text"
             name="title"
-            value={values.title}
+            value={editData.title}
             onChange={handleChange}
             placeholder="Task title..."
             autoFocus
@@ -53,7 +60,7 @@ function TaskItem({ task }) {
 
           <textarea
             name="description"
-            value={values.description}
+            value={editData.description}
             onChange={handleChange}
             placeholder="Task description..."
             rows="3"
@@ -61,7 +68,7 @@ function TaskItem({ task }) {
 
           <select
             name="priority"
-            value={values.priority}
+            value={editData.priority}
             onChange={handleChange}
           >
             <option value={PRIORITY_LEVELS.LOW}>Low</option>
@@ -113,7 +120,7 @@ function TaskItem({ task }) {
             {task.completed ? '✓ Completed' : '○ Pending'}
           </button>
           <button
-            onClick={startEditing}
+            onClick={() => setIsEditing(true)}
             className="edit-btn"
             title="Edit task"
           >

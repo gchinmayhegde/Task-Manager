@@ -3,7 +3,7 @@ import { taskReducer } from './taskReducer';
 import { initialState, ACTIONS } from '../utils/constants';
 import { filterTasks, calculateTaskStats } from '../utils/helpers';
 
-// Createing Context
+// Creating Context
 const TaskContext = createContext();
 
 export const useTaskContext = () => {

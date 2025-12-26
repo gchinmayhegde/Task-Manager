@@ -1,5 +1,5 @@
+import { useState } from 'react';
 import { useTaskContext } from '../context/TaskContext';
-import { useForm } from '../hooks/useForm';
 import { PRIORITY_LEVELS } from '../utils/constants';
 import { validateTask } from '../utils/helpers';
 import './TaskForm.css';
@@ -7,24 +7,36 @@ import './TaskForm.css';
 function TaskForm() {
   const { addTask } = useTaskContext();
   
-  const { values, handleChange, resetForm } = useForm({
+  const [formData, setFormData] = useState({
     title: '',
     description: '',
     priority: PRIORITY_LEVELS.MEDIUM
   });
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    if (!validateTask(values)) {
+    if (!validateTask(formData)) {
       return;
     }
 
-    addTask(values);
-    resetForm();
+    addTask(formData);
+    setFormData({
+      title: '',
+      description: '',
+      priority: PRIORITY_LEVELS.MEDIUM
+    });
   };
 
-  const isSubmitDisabled = !values.title.trim();
+  const isSubmitDisabled = !formData.title.trim();
 
   return (
     <form className="task-form" onSubmit={handleSubmit}>
@@ -38,7 +50,7 @@ function TaskForm() {
           type="text"
           id="title"
           name="title"
-          value={values.title}
+          value={formData.title}
           onChange={handleChange}
           placeholder="Enter task title"
           required
@@ -50,7 +62,7 @@ function TaskForm() {
         <textarea
           id="description"
           name="description"
-          value={values.description}
+          value={formData.description}
           onChange={handleChange}
           placeholder="Enter task description (optional)"
           rows="3"
@@ -62,7 +74,7 @@ function TaskForm() {
         <select
           id="priority"
           name="priority"
-          value={values.priority}
+          value={formData.priority}
           onChange={handleChange}
         >
           <option value={PRIORITY_LEVELS.LOW}>Low</option>
